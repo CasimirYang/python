@@ -9,7 +9,7 @@ from py2neo.cypher.error.schema import ConstraintViolation
 
 watch("httpstream")  #The watch function comes with the bundled httpstream library and simply dumps log entries to standard output.
 
-graph = Graph("http://neo4j:080370053@localhost:7474/db/data/")
+graph = Graph("http://neo4j:123456@localhost:7474/db/data/")
 #graph.schema.create_uniqueness_constraint("IP", "ip")
 
 
