@@ -1,78 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import re
-
-import itertools
-import requests
-from bs4 import BeautifulSoup
+from requests_futures.sessions import FuturesSession
 
 from crawlerIP.connectTest import connectTest
-from crawlerIP.dbUtil import saveToNeo
-
-class ipInfo(object):
-    __slots__ = ('ip', 'host', 'user', 'password','type','location') # 用tuple定义允许绑定的属性名称
-
-    def __init__(self, ip, host, user='', password='',type='http',location='CN'):
-        self.ip = ip
-        self.host = host
-        self.user = user
-        self.password = password
-        self.type = type
-        self.location =location
-
-def proxy360():
-    ipInfoList = []
-    url = 'http://www.proxy360.cn/Proxy'
-    response = requests.get(url)
-    soup = BeautifulSoup(response.content, "html.parser")
-    for item in soup.select(".proxylistitem"):
-        ipHost = item.find("div").find_all("span", limit=2)
-        ip = str(ipHost[0].string).strip()
-        host = str(ipHost[1].string).strip()
-        ipInfoList.append(ipInfo(ip, host))
-        #print(ipInfoList) #todo
-        return ipInfoList
-
-# ipInfoList = connectTest(proxy360())
-# print(len(ipInfoList))
-# if(len(ipInfoList)>0):
-#     saveToNeo(ipInfoList)
-
-def xicidaili(urlList):
-    for url in urlList:
-        natuals = itertools.count(1)
-        ns = itertools.takewhile(lambda x: x <= 10, natuals)
-        for i in list(ns):
-            url= url+str(i)
-            ipInfoList = connectTest(xicidailiSinglePage(url))
-            print(len(ipInfoList))
-            if(len(ipInfoList)>0):
-                saveToNeo(ipInfoList)
-
-def xicidailiSinglePage(url):
-    ipInfoList = []
-    #url = 'http://www.xicidaili.com/'
-    headers = {'user-agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.103 Safari/537.36'}
-    response = requests.get(url,headers=headers)
-    soup = BeautifulSoup(response.content, "html.parser")
-    for item in soup.select(".odd"):
-        ipHost = item.find_all("td")
-        ip = str(ipHost[2].string).strip()
-        host = str(ipHost[3].string).strip()
-        type = str(ipHost[6].string).strip()
-        ipInfoList.append(ipInfo(ip, host,type=type))
-        print("{0}:{1} {2}".format(ip,host,type))
-    return ipInfoList
-
-# urlList=[]
-# urlList.append("http://www.xicidaili.com/nn/")
-# urlList.append("http://www.xicidaili.com/nt/")
-# urlList.append("http://www.xicidaili.com/wn/")
-# urlList.append("http://www.xicidaili.com/wt/")
-# xicidaili(urlList)
+from crawlerIP.dbUtil import saveToNeo, getIpInfoListFromNeo
+from crawlerIP.supplier import proxy360, xicidaili
 
 
-#http://ip.zdaye.com/dayProxy/2016/3/1.html
+IP_INFOList = connectTest(proxy360())
+print(len(IP_INFOList))
+if len(IP_INFOList) > 0:
+    saveToNeo(IP_INFOList)
+
+
+IP_INFOList = connectTest(xicidaili())
+print(len(IP_INFOList))
+if len(IP_INFOList) > 0:
+    saveToNeo(IP_INFOList)
+
+
 
 
 
@@ -87,3 +33,4 @@ def xicidailiSinglePage(url):
 # print(response.text)
 # print(response.status_code)
 
+session = FuturesSession()
