@@ -4,10 +4,11 @@ import asyncio
 
 import aiohttp
 import requests
+from bs4 import BeautifulSoup
 
-
+list = []
 def connectTest(ipInfoList):
-    list = []
+    global list
     httpUrl = 'http://www.baidu.com'
     httpsUrl = 'https://www.baidu.com'
     for ipInfo in ipInfoList:
@@ -22,7 +23,7 @@ def connectTest(ipInfoList):
         else:
             continue
         try:
-            response = requests.head(url, proxies=proxies, timeout=5)
+            response = requests.head(url, proxies=proxies, timeout=0.5)
         except Exception as e:
             print("{ip}:{host} connect faild".format(ip=ipInfo.ip, host=ipInfo.host))
         else:
@@ -33,6 +34,8 @@ def connectTest(ipInfoList):
 
 
 def connectTestAsync(ipInfoList):
+    global list
+    list = []
     if len(ipInfoList) > 10:
         raise ImportWarning("ipInfoList >10 !! ")
     asyncio.get_event_loop().run_until_complete(asyncio.wait([fetch(ipInfo) for ipInfo in ipInfoList]))
@@ -40,22 +43,22 @@ def connectTestAsync(ipInfoList):
 
 
 async def fetch(ipInfo):
-    with aiohttp.Timeout(2):
+    with aiohttp.Timeout(0.5):
         global list
-        url = "{0}://www.baidu.com".format(ipInfo.type)
-        proxy = "{type}://{ip}:{host}".format(type=ipInfo.type, ip=ipInfo.ip, host=ipInfo.host)
+        url = "http://www.baidu.com"
+        proxy = "http://{ip}:{host}".format(type=ipInfo.type, ip=ipInfo.ip, host=ipInfo.host)
         print("crawler from :{url} using:{proxy}".format(url=url, proxy=proxy))
         conn = aiohttp.ProxyConnector(proxy=proxy)
-
         client = aiohttp.ClientSession(connector=conn)
-
         try:
             async with client.get(url) as resp:
+                print(resp.status)
                 if resp.status == 200:
                     list.append(ipInfo)
                     print("{ip}:{host} connect success !!".format(ip=ipInfo.ip, host=ipInfo.host))
         except Exception as e:
             print("{ip}:{host} connect faild".format(ip=ipInfo.ip, host=ipInfo.host))
-            #todo log e
-
+            print(e)
+        finally:
+            client.close()
 

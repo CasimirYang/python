@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
+http://www.youdaili.net
 http://www.proxy360.cn/Proxy
 http://www.xicidaili.com/
 http://ip.zdaye.com/dayProxy/2016/3/1.html
@@ -9,10 +10,15 @@ https://www.imfreevpn.com/
 """
 
 import itertools
+import re
+
 import requests
 from bs4 import BeautifulSoup
+from requests.packages.urllib3.exceptions import HTTPError
 
 from crawlerIP import IpInfo
+
+headers = {'user-agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.103 Safari/537.36'}
 
 
 def proxy360():
@@ -41,15 +47,14 @@ def xicidaili():
         ns = itertools.takewhile(lambda x: x <= 10, natuals)
         for i in list(ns):
             url= url+str(i)
-            ipInfoList.extend(xicidailiSinglePage(url))
+            ipInfoList.extend(xicidailiItem(url))
     #print(len(ipInfoList))  #todo
     return ipInfoList
 
 
-def xicidailiSinglePage(url):
+def xicidailiItem(url):
     ipInfoList = []
     #url = 'http://www.xicidaili.com/'
-    headers = {'user-agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.103 Safari/537.36'}
     response = requests.get(url, headers=headers)
     soup = BeautifulSoup(response.content, "html.parser")
     for item in soup.select(".odd"):
@@ -58,7 +63,91 @@ def xicidailiSinglePage(url):
         host = str(ipHost[3].string).strip()
         type = str(ipHost[6].string).strip()
         ipInfoList.append(IpInfo(ip, host, type=type))
-        print("{0}:{1} {2}".format(ip, host, type))
+        #todo print("{0}:{1} {2}".format(ip, host, type))
+    return ipInfoList
+
+def zdaye():
+    ipInfoList = []
+    url = "http://ip.zdaye.com/dayProxy/2016/3/1.html"
+    cookies = {"cf_clearance" : "7883097748f99d85c974890303c6307cd9cd4aca-1457012666-1800"}
+    response = requests.get(url, headers=headers, cookies=cookies)
+    print(response.status_code)
+    soup = BeautifulSoup(response.content, "html.parser")
+    print(soup.text)
+    for item in soup.select(".title"):
+        href = "http://ip.zdaye.com{0}".format(item.a["href"])
+        ipInfoList.extend(zdaygItem(href))
     return ipInfoList
 
 
+def zdaygItem(url):
+    ipInfoList = []
+    cookies = {"cf_clearance" : "7883097748f99d85c974890303c6307cd9cd4aca-1457012666-1800"}
+    response = requests.get(url, headers=headers,cookies=cookies)
+    soup = BeautifulSoup(response.content, "html.parser")
+    print(soup.text)
+    for br in soup.find(".cont").br:
+        ipHost = str(br.text).strip()
+        print(ipHost)
+        print(re.match('d+\.d+\.d+\.d+:d+', ipHost).groups(0))
+        #ipInfoList.append(IpInfo(ip, host, type=type))
+        #print("{0}:{1} {2}".format(ip, host, type))
+    return ipInfoList
+
+
+def bigdaili():
+    ipInfoList = []
+    natuals = itertools.count(1)
+    ns = itertools.takewhile(lambda x: x <= 4, natuals)
+    for i in list(ns):
+        natuals_2 = itertools.count(1)
+        ns_2 = itertools.takewhile(lambda x: x <= 10, natuals_2)
+        for j in list(ns_2):
+            url = "http://www.bigdaili.com/dailiip/{0}/{1}.html#ip".format(i,j)
+            ipInfoList.extend(bigdailiItem(url))
+    return ipInfoList
+
+
+def bigdailiItem(url):
+    ipInfoList = []
+    response = requests.get(url, headers=headers)
+    soup = BeautifulSoup(response.content, "html.parser")
+    print(response.status_code)
+    for tr in soup.select(".segment tbody tr"):
+        ipHost = tr.find_all("td", limit=2)
+        ip = str(ipHost[0].string).strip()
+        host = str(ipHost[1].string).strip()
+        ipInfoList.append(IpInfo(ip, host))
+    return ipInfoList
+
+def youdaili():
+    ipInfoList = []
+    url = "http://www.youdaili.net"
+    linkList = []
+    response = requests.get(url)
+    if(response.status_code != 200):
+        raise HTTPError("could not connect to :%s ", url)
+    soup = BeautifulSoup(response.content,"html.parser")
+    re_sameDomain = re.compile(r'^http://www\.youdaili\.net/Daili[^s]*html')  #http://www.youdaili.net/Daili/
+    for link in soup.find_all('a'):
+        link = link.get('href')
+        #str(link.get('href')).startswith('http://www.youdaili.net/Daili/')
+        if(link != None and re_sameDomain.match(link)):
+            print(link)
+            linkList.append(link)
+    for url in linkList:
+        response = requests.get(url)
+        if(response.status_code == 200):
+            soup = BeautifulSoup(response.content,"html.parser")
+            try:
+                for p in soup.select(".cont_font p"):
+                    for item in str(p).split("<br/>"):
+                        print(str(item).strip())
+                        ipHost = re.match("\d+\.\d+\.\d+\.\d+:\d+",str(item).strip())
+                        if ipHost is not None:
+                            ipHost = ipHost.group(0).split(":")
+                            ipInfoList.append(IpInfo(ipHost[0], ipHost[1]))
+            except AttributeError as e:
+                # logging.exception(e)
+                print(e)
+    return ipInfoList

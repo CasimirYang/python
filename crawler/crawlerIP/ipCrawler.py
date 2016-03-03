@@ -1,39 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from requests_futures.sessions import FuturesSession
 
-from crawlerIP.connectTest import connectTest, connectTestAsync
-from crawlerIP.dbUtil import saveToNeo, getIpInfoListFromNeo
-from crawlerIP.supplier import proxy360, xicidaili
-
-
-# IP_INFOList = connectTest(proxy360())
-# print(len(IP_INFOList))
-# if len(IP_INFOList) > 0:
-#     saveToNeo(IP_INFOList)
-#
-#
-# IP_INFOList = connectTest(xicidaili())
-# print(len(IP_INFOList))
-# if len(IP_INFOList) > 0:
-#     saveToNeo(IP_INFOList)
-
+from crawlerIP.connectTest import connectTestAsync
+from crawlerIP.dbUtil import saveToNeo
+from crawlerIP.supplier import proxy360, xicidaili, bigdaili, youdaili
 
 raw_list = []
 raw_list.extend(proxy360())
-#raw_list.extend(xicidaili())
+raw_list.extend(xicidaili())
+raw_list.extend(bigdaili())
+raw_list.extend(youdaili())
 success_list = []
 print(len(raw_list))
 i = 0
 while 1:
     if not len(raw_list) > i:
         break
-    result_list = connectTestAsync(raw_list[i:i+5])
+    result_list = connectTestAsync(raw_list[i:i+10])
     if isinstance(result_list, list) and len(result_list) > 0:
         success_list.extend(result_list)
-    i = i+5
-print(len(success_list))
+    i = i+10
+print(len(success_list)) #todo change to log
 print(success_list)
+if len(success_list) > 0:
+     saveToNeo(success_list)
+
 
 
 # url = 'http://apis.baidu.com/apistore/iplookupservice/iplookup?ip=46.61.143.178'
@@ -46,3 +37,4 @@ print(success_list)
 # response = requests.get(url)
 # print(response.text)
 # print(response.status_code)
+
