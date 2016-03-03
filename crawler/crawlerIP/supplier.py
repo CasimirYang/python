@@ -24,9 +24,9 @@ def proxy360():
         ipHost = item.find("div").find_all("span", limit=2)
         ip = str(ipHost[0].string).strip()
         host = str(ipHost[1].string).strip()
-        ipInfoList.append(ipInfoList(ip, host))
+        ipInfoList.append(IpInfo(ip, host))
         #print(IP_INFOList) #todo
-        return ipInfoList
+    return ipInfoList
 
 
 def xicidaili():
@@ -41,7 +41,7 @@ def xicidaili():
         ns = itertools.takewhile(lambda x: x <= 10, natuals)
         for i in list(ns):
             url= url+str(i)
-            ipInfoList.append(xicidailiSinglePage(url))
+            ipInfoList.extend(xicidailiSinglePage(url))
     #print(len(ipInfoList))  #todo
     return ipInfoList
 

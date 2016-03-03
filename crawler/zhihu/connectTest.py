@@ -4,7 +4,6 @@ import asyncio
 
 import aiohttp
 
-from crawlerIP import IpInfo
 
 list = []
 
