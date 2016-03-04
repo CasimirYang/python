@@ -97,13 +97,9 @@ def zdaygItem(url):
 
 def bigdaili():
     ipInfoList = []
-    natuals = itertools.count(1)
-    ns = itertools.takewhile(lambda x: x <= 4, natuals)
-    for i in list(ns):
-        natuals_2 = itertools.count(1)
-        ns_2 = itertools.takewhile(lambda x: x <= 10, natuals_2)
-        for j in list(ns_2):
-            url = "http://www.bigdaili.com/dailiip/{0}/{1}.html#ip".format(i,j)
+    for i in range(1, 5):
+        for j in range(1, 11):
+            url = "http://www.bigdaili.com/dailiip/{0}/{1}.html#ip".format(i, j)
             ipInfoList.extend(bigdailiItem(url))
     return ipInfoList
 
