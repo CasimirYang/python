@@ -5,14 +5,22 @@ formatters:
 handlers:
   console:
     class: logging.StreamHandler
-    level: DEBUG
+    level: INFO
     formatter: simple
     stream: ext://sys.stdout
-loggers:
-  ipCrawler:
+  file:
+    class: logging.FileHandler
     level: DEBUG
-    handlers: [console]
-    propagate: no
-root:
-  level: DEBUG
-  handlers: [console]
+    formatter: simple
+    filename: ../log/ipCrawler.log
+loggers:
+#  ipCrawler:
+#    level: DEBUG
+#    handlers: [console]
+#    propagate: no
+  crawlerIP:
+    level: DEBUG
+    handlers: [console,file]
+#root:
+#  level: DEBUG
+#  handlers: [console]

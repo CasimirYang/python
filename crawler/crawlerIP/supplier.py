@@ -34,7 +34,7 @@ def proxy360():
         ip = str(ipHost[0].string).strip()
         host = str(ipHost[1].string).strip()
         ipInfoList.append(IpInfo(ip, host))
-        logger.info("fetch {0} IPs from www.proxy360.cn".format(len(ipInfoList)))
+    logger.info("fetch {0} IPs from www.proxy360.cn".format(len(ipInfoList)))
     return ipInfoList
 
 
