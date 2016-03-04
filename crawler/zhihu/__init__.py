@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import asyncio
+import os
 from asyncio import sleep
 
 import aiohttp
@@ -9,6 +10,7 @@ import aiohttp
 #     print("Hello world!")
 #     r = await sleep(1)
 #     print("Hello again!")
+
 
 async def getResponse(session):
     resp = session.get('https://api.github.com/events')
@@ -34,5 +36,7 @@ async def fetch3(client):
         assert resp.status == 200
         print(await resp.text())
 
-with aiohttp.ClientSession() as client:
-    asyncio.get_event_loop().run_until_complete(asyncio.wait([fetch(client), fetch2(client), fetch3(client)]))
+# with aiohttp.ClientSession() as client:
+#     asyncio.get_event_loop().run_until_complete(asyncio.wait([fetch(client), fetch2(client), fetch3(client)]))
+# print("11",os.getcwd())
+# print(open('/crawler/config/loggingConfig.yaml', 'r'))

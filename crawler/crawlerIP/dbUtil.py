@@ -10,6 +10,7 @@ from crawlerIP import IpInfo
 
 watch("httpstream")  #The watch function comes with the bundled httpstream library and simply dumps log entries to standard output.
 graph = Graph("http://neo4j:123456@localhost:7474/db/data/")
+logger = logging.getLogger(__name__)
 
 #graph.schema.create_uniqueness_constraint("IP", "ip")
 
@@ -28,33 +29,35 @@ def saveToNeo(ipInfoList):
         try:
             transaction.process()
         except ConstraintViolation as e:
-            print(e) #todo
-    transaction.commit()
+            transaction.rollback()
+            logger.info("{0}:{1} existed.".format(ip, host))
+            logger.debug(e)
+        transaction.commit() #TODO to check logic
     end = time.time()
-    print("spent time:{0}".format(end-begin)) #todo
+    logger.info("spent time:{0} to save {1} IPs.".format(end-begin, len(ipInfoList)))
 
 
 def getIpInfoListFromNeo2():
-    time1 = time.time()
+    begin = time.time()
     ipInfoList = []
     ipInfo_Node_List = graph.cypher.execute("MATCH (IpList:IpInfo) RETURN IpList")
     for node in ipInfo_Node_List:
         ipInfo = IpInfo(node[0].properties["ip"], node[0].properties["host"])
         ipInfoList.append(ipInfo)
-    time2 = time.time()
-    print(time2-time1)
+    end = time.time()
+    logger.info("spent time:{0} to get ip from Neo.".format(end-begin))
     print(len(ipInfo_Node_List))
     return ipInfoList
 
 
-def getIpInfoListFromNeo():
-    time1 = time.time()
+def getIpInfoListFromNeo(limit=10):
+    begin = time.time()
     ipInfoList = []
-    ipInfo_Node_List = graph.find("IpInfo")
+    ipInfo_Node_List = graph.find("IpInfo", limit=limit)
     for node in ipInfo_Node_List:
         ipInfo = IpInfo(node.properties["ip"], node.properties["host"])  #todo
         ipInfoList.append(ipInfo)
-    time2 = time.time()
-    print(time2-time1)
+    end = time.time()
+    logger.info("spent time:{0} to get {1} IPs from Neo.".format(end-begin, limit))
     return ipInfoList
 

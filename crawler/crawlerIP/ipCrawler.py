@@ -1,29 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import yaml
+import logging.config
+import crawlerIP
 
-from crawlerIP.connectTest import connectTestAsync
-from crawlerIP.dbUtil import saveToNeo
-from crawlerIP.supplier import proxy360, xicidaili, bigdaili, youdaili
 
-raw_list = []
-raw_list.extend(proxy360())
-raw_list.extend(xicidaili())
-raw_list.extend(bigdaili())
-raw_list.extend(youdaili())
-success_list = []
-print(len(raw_list))
-i = 0
-while 1:
-    if not len(raw_list) > i:
-        break
-    result_list = connectTestAsync(raw_list[i:i+10])
-    if isinstance(result_list, list) and len(result_list) > 0:
-        success_list.extend(result_list)
-    i = i+10
-print(len(success_list)) #todo change to log
-print(success_list)
-if len(success_list) > 0:
-     saveToNeo(success_list)
+yamlConfig = yaml.load(open('../config/loggingConfig.yaml', 'r'))
+logging.config.dictConfig(yamlConfig)
+
+
+logger = logging.getLogger(__name__)
+logger.info('begin to crawler IP')
+crawlerIP.ipCrawler()
+logger.info('crawler IP finish.')
+
+
+
+
+
+
 
 
 

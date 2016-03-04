@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import asyncio
+import logging
 
 import aiohttp
 import requests
-from bs4 import BeautifulSoup
+
 
 list = []
+logger = logging.getLogger(__name__)
+
 def connectTest(ipInfoList):
     global list
     httpUrl = 'http://www.baidu.com'
@@ -25,11 +28,12 @@ def connectTest(ipInfoList):
         try:
             response = requests.head(url, proxies=proxies, timeout=0.5)
         except Exception as e:
-            print("{ip}:{host} connect faild".format(ip=ipInfo.ip, host=ipInfo.host))
+            logger.info("{ip}:{host} connect faild".format(ip=ipInfo.ip, host=ipInfo.host))
+            logger.debug(e)
         else:
             if response.status_code == 200:
                 list.append(ipInfo)
-                print("{ip}:{host} connect success !!".format(ip=ipInfo.ip, host=ipInfo.host))
+                logger.info("{ip}:{host} connect success !!".format(ip=ipInfo.ip, host=ipInfo.host))
     return list
 
 
@@ -37,7 +41,8 @@ def connectTestAsync(ipInfoList):
     global list
     list = []
     if len(ipInfoList) > 10:
-        raise ImportWarning("ipInfoList >10 !! ")
+        logger.warn("ipInfoList >10 !! ")
+        return
     asyncio.get_event_loop().run_until_complete(asyncio.wait([fetch(ipInfo) for ipInfo in ipInfoList]))
     return list
 
@@ -47,18 +52,17 @@ async def fetch(ipInfo):
         global list
         url = "http://www.baidu.com"
         proxy = "http://{ip}:{host}".format(type=ipInfo.type, ip=ipInfo.ip, host=ipInfo.host)
-        print("crawler from :{url} using:{proxy}".format(url=url, proxy=proxy))
+        logger.info("crawler from :{url} using:{proxy}".format(url=url, proxy=proxy))
         conn = aiohttp.ProxyConnector(proxy=proxy)
         client = aiohttp.ClientSession(connector=conn)
         try:
             async with client.get(url) as resp:
-                print(resp.status)
                 if resp.status == 200:
                     list.append(ipInfo)
-                    print("{ip}:{host} connect success !!".format(ip=ipInfo.ip, host=ipInfo.host))
+                    logger.info("{ip}:{host} connect success !!".format(ip=ipInfo.ip, host=ipInfo.host))
         except Exception as e:
-            print("{ip}:{host} connect faild".format(ip=ipInfo.ip, host=ipInfo.host))
-            print(e)
+            logger.info("{ip}:{host} connect faild".format(ip=ipInfo.ip, host=ipInfo.host))
+            logger.debug(e)
         finally:
             client.close()
 
