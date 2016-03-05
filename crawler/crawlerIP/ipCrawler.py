@@ -9,6 +9,8 @@ from crawlerIP.supplier import proxy360, xicidaili, bigdaili, youdaili
 yamlConfig = yaml.load(open('../config/loggingConfig.yaml', 'r'))
 logging.config.dictConfig(yamlConfig)
 
+logger = logging.getLogger(__name__)
+
 
 def ipCrawler():
     raw_list = []
@@ -44,12 +46,17 @@ def ipCrawler():
             success_list.extend(result_list)
         i = i+10
     logger.info("After connect test, there are {count} IP in this job.".format(count=len(success_list)))
-    if len(success_list) > 0:
-         saveToNeo(success_list)
+
+    j = 0
+    while 1:
+        if not len(success_list) > j:
+            break
+        result_list = success_list[j:j+100]
+        if isinstance(result_list, list) and len(result_list) > 0:
+            saveToNeo(result_list)
+        j = j+100
 
 
-
-logger = logging.getLogger(__name__)
 logger.info('begin to crawler IP')
 ipCrawler()
 logger.info('crawler IP finish.')

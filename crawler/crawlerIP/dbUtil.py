@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 def saveToNeo(ipInfoList):
     begin = time.time()
     transaction = graph.cypher.begin()
-    statement = "CREATE (:IpInfo {ip:{ip},host:{host},user:{user},password:{password},type:{type},location:{location},time:{time}})"
+    statement = "MERGE (:IpInfo {ip:{ip},host:{host},user:{user},password:{password},type:{type},location:{location},time:{time}})"
     for ipInfo in ipInfoList:
         ip = ipInfo.ip
         host = ipInfo.host
@@ -26,13 +26,8 @@ def saveToNeo(ipInfoList):
         type = ipInfo.type
         location = ipInfo.location
         transaction.append(statement, {"ip": ip, "host": host, "user": user, "password": password, "type": type, "location": location, "time": time.time()})
-        try:
-            transaction.process()
-        except ConstraintViolation as e:
-            transaction.rollback()
-            logger.info("{0}:{1} existed.".format(ip, host))
-            logger.debug(e)
-        transaction.commit() #TODO to check logic
+        transaction.process()
+    transaction.commit()
     end = time.time()
     logger.info("spent time:{0} to save {1} IPs.".format(end-begin, len(ipInfoList)))
 

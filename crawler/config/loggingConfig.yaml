@@ -13,14 +13,27 @@ handlers:
     level: DEBUG
     formatter: simple
     filename: ../log/ipCrawler.log
+  neoFile:
+    class: logging.FileHandler
+    level: DEBUG
+    formatter: simple
+    filename: ../log/neoIpCrawler.log
+  rootFile:
+    class: logging.FileHandler
+    level: DEBUG
+    formatter: simple
+    filename: ../log/rootFileIpCrawler.log
 loggers:
-#  ipCrawler:
-#    level: DEBUG
-#    handlers: [console]
-#    propagate: no
+  py2neo.cypher:
+    level: INFO
+    handlers: [neoFile]
   crawlerIP:
     level: DEBUG
     handlers: [console,file]
+    propagate: no
+  __main__:
+    level: INFO
+    handlers: [console,file]
 #root:
 #  level: DEBUG
-#  handlers: [console]
+#  handlers: [console,rootFile]
