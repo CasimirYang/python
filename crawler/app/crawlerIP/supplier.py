@@ -15,9 +15,8 @@ import re
 
 import requests
 from bs4 import BeautifulSoup
-from requests.packages.urllib3.exceptions import HTTPError
 
-from crawlerIP import IpInfo
+from app.crawlerIP import IpInfo
 
 headers = {'user-agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.103 Safari/537.36'}
 logger = logging.getLogger(__name__)

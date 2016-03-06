@@ -1,18 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import yaml
 import logging.config
-from crawlerIP.connectTest import connectTestAsync
+
+import yaml
 from crawlerIP.dbUtil import saveToNeo
 from crawlerIP.supplier import proxy360, xicidaili, bigdaili, youdaili
 
-yamlConfig = yaml.load(open('../config/loggingConfig.yaml', 'r'))
+from app.crawlerIP.connectTest import connectTestAsync
+
+yamlConfig = yaml.load(open('../conf/loggingConfig.yaml', 'r'))
 logging.config.dictConfig(yamlConfig)
 
 logger = logging.getLogger(__name__)
 
 
 def ipCrawler():
+    logger.info('begin to crawler IP')
     raw_list = []
     try:
         raw_list.extend(proxy360())
@@ -55,23 +58,4 @@ def ipCrawler():
         if isinstance(result_list, list) and len(result_list) > 0:
             saveToNeo(result_list)
         j = j+100
-
-
-logger.info('begin to crawler IP')
-ipCrawler()
-logger.info('crawler IP finish.')
-
-
-
-
-# url = 'http://apis.baidu.com/apistore/iplookupservice/iplookup?ip=46.61.143.178'
-# headers= {"apikey":"98b0fd667b061d25c9aea82c0f42d0b5"}
-# response = requests.get(url,headers=headers)
-# print(response.content)
-# print(response.json())
-# url="http://www.google.com"
-# proxies ={'http':"http://46.61.143.178:8080"}
-# response = requests.get(url)
-# print(response.text)
-# print(response.status_code)
-
+    logger.info('crawler IP finish.')

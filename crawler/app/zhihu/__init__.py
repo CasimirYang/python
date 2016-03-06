@@ -39,4 +39,4 @@ async def fetch3(client):
 # with aiohttp.ClientSession() as client:
 #     asyncio.get_event_loop().run_until_complete(asyncio.wait([fetch(client), fetch2(client), fetch3(client)]))
 # print("11",os.getcwd())
-# print(open('/crawler/config/loggingConfig.yaml', 'r'))
+# print(open('/crawler/conf/loggingConfig.yaml', 'r'))

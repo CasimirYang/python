@@ -4,9 +4,8 @@ import logging
 import time
 
 from py2neo import Graph, watch
-from py2neo.cypher.error.schema import ConstraintViolation
 
-from crawlerIP import IpInfo
+from app.crawlerIP import IpInfo
 
 watch("httpstream")  #The watch function comes with the bundled httpstream library and simply dumps log entries to standard output.
 graph = Graph("http://neo4j:123456@localhost:7474/db/data/")

@@ -14,11 +14,11 @@ async def fetch(client, url):
         #todo handle response
 
 
-
-print(aiohttp.ClientSession())
-print(aiohttp.ClientSession())
-with aiohttp.ClientSession() as client:
-    print(client)
-
-
-    asyncio.get_event_loop().run_until_complete(asyncio.wait([fetch(client), fetch2(client), fetch3(client)]))
+#
+# print(aiohttp.ClientSession())
+# print(aiohttp.ClientSession())
+# with aiohttp.ClientSession() as client:
+#     print(client)
+#
+#
+#     asyncio.get_event_loop().run_until_complete(asyncio.wait([fetch(client), fetch2(client), fetch3(client)]))
