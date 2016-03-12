@@ -8,32 +8,49 @@ handlers:
     level: INFO
     formatter: simple
     stream: ext://sys.stdout
-  file:
+  ipFile:
     class: logging.FileHandler
     level: DEBUG
     formatter: simple
-    filename: ../log/ipCrawler.log
-  neoFile:
+    filename: ../../log/ipCrawler.log
+  neoIpCrawler:
     class: logging.FileHandler
     level: DEBUG
     formatter: simple
-    filename: ../log/neoIpCrawler.log
+    filename: ../../log/neoIpCrawler.log
+  neo:
+    class: logging.FileHandler
+    level: DEBUG
+    formatter: simple
+    filename: ../../log/neo.log
+  zhihuFile:
+    class: logging.FileHandler
+    level: DEBUG
+    formatter: simple
+    filename: ../../log/zhihuCrawler.log
+    encoding : UTF-8
   rootFile:
     class: logging.FileHandler
     level: DEBUG
     formatter: simple
-    filename: ../log/rootFileIpCrawler.log
+    filename: ../../log/rootFileIpCrawler.log
 loggers:
-  py2neo.cypher:
-    level: INFO
-    handlers: [neoFile]
-  crawlerIP:
+#  py2neo.cypher:
+#    level: INFO
+#    handlers: [neo]
+  app.crawlerIP:
     level: DEBUG
-    handlers: [console,file]
+    handlers: [console,ipFile]
     propagate: no
+  app.zhihu:
+    level: INFO
+    handlers: [console,zhihuFile]
   __main__:
     level: INFO
-    handlers: [console,file]
+    handlers: [console,zhihuFile]
 #root:
 #  level: DEBUG
 #  handlers: [console,rootFile]
+logging:
+  level: ERROR
+  handlers: [zhihuFile]
