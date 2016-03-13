@@ -30,12 +30,13 @@ def get_user():
 def save_user(user_list):
     begin = time.time()
     transaction = graph.cypher.begin()
-    statement = "MERGE (peo:user{user_id:{user_id}}) ON CREATE SET" \
-                " peo.user_id={user_id},peo.user_name={user_name},peo.have_disposed={have_disposed}"
+    statement = "MERGE (peo:user{user_id:{user_id}}) ON MATCH SET peo.have_disposed={merge_disposed}  " \
+                "ON CREATE SET peo.user_id={user_id},peo.user_name={user_name},peo.have_disposed={create_disposed}"
+    # statement = "CREATE (:user {user_id:{user_id},user_name:{user_name},have_disposed:{have_disposed}})"
     for user in user_list:
         user_id = user.user_id
         user_name = user.user_name
-        transaction.append(statement, {"user_id": user_id, "user_name": user_name, "have_disposed": user.have_disposed})
+        transaction.append(statement, {"user_id": user_id, "user_name": user_name, "merge_disposed": user.have_disposed, "create_disposed": user.have_disposed})
         transaction.process()
     transaction.commit()
     end = time.time()
@@ -43,29 +44,29 @@ def save_user(user_list):
     logger.info("spent time:{0} to save {1} users.".format(end-begin, len(user_list)))
 
 
-def save_followee(user, followeeList):
+def save_followee(user, followee_list):
     begin = time.time()
     transaction = graph.cypher.begin()
+    # statement = "MATCH (origin:user{user_id:{user_id}}),(followee:user{user_id:{followee_user_id}})" \
+    #             " MERGE (origin)-[:follower]->(followee)"
     statement = "MATCH (origin:user{user_id:{user_id}}),(followee:user{user_id:{followee_user_id}})" \
                 " MERGE (origin)-[:follower]->(followee)"
-    for followee in followeeList:
+    for followee in followee_list:
         transaction.append(statement, {"user_id": user.user_id, "followee_user_id": followee.user_id})
         transaction.process()
     transaction.commit()
     end = time.time()
-    #print("spent time:{0} to save {1} followees.".format(end-begin, len(followeeList))) #todo
-    logger.info("spent time:{0} to save {1} followees.".format(end-begin, len(followeeList)))
+    logger.info("spent :{0} seconds to save {1} followees.".format(end-begin, len(followee_list)))
 
 
-def save_follower(user, followerList):
+def save_follower(user, follower_list):
     begin = time.time()
     transaction = graph.cypher.begin()
     statement = "MATCH (follower:user {user_id:{follower_user_id}}),(origin:user {user_id:{user_id}})" \
                 " MERGE (follower)-[:follower]->(origin)"
-    for follower in followerList:
+    for follower in follower_list:
         transaction.append(statement, {"follower_user_id": follower.user_id, "user_id": user.user_id})
         transaction.process()
     transaction.commit()
     end = time.time()
-    #print("spent time:{0} to save {1} followerList.".format(end-begin, len(followerList))) #todo
-    logger.info("spent time:{0} to save {1} followers.".format(end-begin, len(followerList)))
+    logger.info("spent :{0} seconds to save {1} followers.".format(end-begin, len(follower_list)))

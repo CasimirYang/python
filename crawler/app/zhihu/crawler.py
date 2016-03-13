@@ -10,7 +10,7 @@ from app.zhihu.dbUtil import get_user
 
 yamlConfig = yaml.load(open(r'../../conf/loggingConfig.yaml', 'r'))
 logging.config.dictConfig(yamlConfig)
-
+logger = logging.getLogger(__name__)
 
 
 def begin_to_crawler():
@@ -24,16 +24,19 @@ def begin_to_crawler():
     print(len(user_list))
     while 1:
         i += 1
-        if len(user_list) == 0 or i > 20:
+        logger.info("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  {0}  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^".format(i))
+        if len(user_list) == 0 or i > 10:
             return #todo sent alert email
 
         #loop it
         for user in user_list:
+            logger.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
             user.have_disposed = 'true'
-            handle_follow(session, user )
+            handle_follow(session, user)
+        user_list = get_user()
 
 
-# begin_to_crawler()
-session = init_session()
-default_user = User('Ace1987', '张兆杰', 'true') #todo change to fetch from config
-handle_follow(session, default_user)
+begin_to_crawler()
+# session = init_session()
+# default_user = User('alexya', '碎瓦', 'true') #todo change to fetch from config
+# handle_follow(session, default_user)
