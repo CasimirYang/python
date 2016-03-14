@@ -3,12 +3,13 @@
 import logging.config
 
 import yaml
-from crawlerIP.dbUtil import saveToNeo
-from crawlerIP.supplier import proxy360, xicidaili, bigdaili, youdaili
+
 
 from app.crawlerIP.connectTest import connectTestAsync
+from app.crawlerIP.dbUtil import saveToNeo, locate_ip_country
+from app.crawlerIP.supplier import proxy360, xicidaili, bigdaili, youdaili
 
-yamlConfig = yaml.load(open('../conf/loggingConfig.yaml', 'r'))
+yamlConfig = yaml.load(open(r'../../conf/loggingConfig.yaml', 'r'))
 logging.config.dictConfig(yamlConfig)
 
 logger = logging.getLogger(__name__)
@@ -38,6 +39,7 @@ def ipCrawler():
         logger.warn("Catch error when fetch ip from youdaili.")
         logger.warn(e)
 
+    raw_list = list(set(raw_list))
     success_list = []
     logger.info("-------------fetch raw {0} IPs in this job------------".format(len(raw_list)))
     i = 0
@@ -47,7 +49,7 @@ def ipCrawler():
         result_list = connectTestAsync(raw_list[i:i+10])
         if isinstance(result_list, list) and len(result_list) > 0:
             success_list.extend(result_list)
-        i = i+10
+        i += 10
     logger.info("After connect test, there are {count} IP in this job.".format(count=len(success_list)))
 
     j = 0
@@ -57,5 +59,7 @@ def ipCrawler():
         result_list = success_list[j:j+100]
         if isinstance(result_list, list) and len(result_list) > 0:
             saveToNeo(result_list)
-        j = j+100
+        j += 100
     logger.info('crawler IP finish.')
+    locate_ip_country()
+    logger.info('locate ip country finish.')

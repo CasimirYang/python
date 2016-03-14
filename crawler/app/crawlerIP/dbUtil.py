@@ -3,15 +3,14 @@
 import logging
 import time
 
-from py2neo import Graph, watch
+from py2neo import Graph
 
 from app.crawlerIP import IpInfo
+from app.crawlerIP.connectTest import check_cn_ip
 
-watch("httpstream")  #The watch function comes with the bundled httpstream library and simply dumps log entries to standard output.
 graph = Graph("http://neo4j:123456@localhost:7474/db/data/")
 logger = logging.getLogger(__name__)
 
-#graph.schema.create_uniqueness_constraint("IP", "ip")
 
 def saveToNeo(ipInfoList):
     begin = time.time()
@@ -55,3 +54,26 @@ def getIpInfoListFromNeo(limit=10):
     logger.info("spent time:{0} to get {1} IPs from Neo.".format(end-begin, limit))
     return ipInfoList
 
+
+def locate_ip_country():
+    while 1:
+        ip_list = graph.cypher.execute("MATCH (ipInfo:IpInfo) WHERE"
+                                                " ipInfo.location='empty' RETURN ipInfo limit 10")
+        if len(ip_list) == 0:
+            return
+        for record in ip_list:
+            ip = record["ipInfo"].properties["ip"]
+            print(ip)
+            country_id = check_cn_ip(ip)
+            if country_id != 'TBC':
+                statement = "MATCH (ip:IpInfo{ip:{ip}}) SET ip.location={location}"
+                graph.cypher.execute(statement, {"ip": ip, "location": country_id})
+            time.sleep(0.2)
+
+
+def get_proxy_ip_host():
+    ip_list = graph.cypher.execute("MATCH (ipInfo:IpInfo) WHERE ipInfo.location='CN' RETURN ipInfo limit 100")
+    for record in ip_list:
+        graph.find_one(label="IpInfo", property_key="location", property_value="CN")
+        ip, host = record['ipInfo'].properties["ip"], record['ipInfo'].properties["host"]
+        yield ip, host

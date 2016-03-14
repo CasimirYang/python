@@ -17,7 +17,7 @@ def begin_to_crawler():
     session = init_session()
     user_list = get_user()
     if len(user_list) == 0:
-        default_user = User('alexya', 'ALEX YA', 'true') #todo change to fetch from config
+        default_user = User('gong-zi-winnie', '心经', 1) #todo change to fetch from config
         handle_follow(session, default_user)
         user_list = get_user()
     i = 0
@@ -25,18 +25,18 @@ def begin_to_crawler():
     while 1:
         i += 1
         logger.info("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  {0}  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^".format(i))
-        if len(user_list) == 0 or i > 10:
+        if len(user_list) == 0 or i > 3:
             return #todo sent alert email
 
         #loop it
         for user in user_list:
             logger.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-            user.have_disposed = 'true'
+            user.status = 1
             handle_follow(session, user)
         user_list = get_user()
 
 
-begin_to_crawler()
+#begin_to_crawler()
 # session = init_session()
-# default_user = User('alexya', '碎瓦', 'true') #todo change to fetch from config
+# default_user = User('gong-zi-winnie', '心经', 1)
 # handle_follow(session, default_user)

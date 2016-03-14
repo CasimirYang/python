@@ -27,7 +27,7 @@ handlers:
     class: logging.FileHandler
     level: DEBUG
     formatter: simple
-    filename: ../../log/zhihuCrawler2.log
+    filename: ../../log/zhihuCrawler.log
     encoding : UTF-8
   rootFile:
     class: logging.FileHandler
@@ -51,6 +51,3 @@ loggers:
 #root:
 #  level: DEBUG
 #  handlers: [console,rootFile]
-logging:
-  level: ERROR
-  handlers: [zhihuFile]

@@ -10,6 +10,7 @@ import requests
 list = []
 logger = logging.getLogger(__name__)
 
+
 def connectTest(ipInfoList):
     global list
     httpUrl = 'http://www.baidu.com'
@@ -66,13 +67,25 @@ async def fetch(ipInfo):
         finally:
             client.close()
 
-# url = 'http://apis.baidu.com/apistore/iplookupservice/iplookup?ip=46.61.143.178'
-# headers= {"apikey":"98b0fd667b061d25c9aea82c0f42d0b5"}
-# response = requests.get(url,headers=headers)
-# print(response.content)
-# print(response.json())
-# url="http://www.google.com"
-# proxies ={'http':"http://46.61.143.178:8080"}
-# response = requests.get(url)
-# print(response.text)
-# print(response.status_code)
+
+def check_cn_ip(ip):
+    country_id = 'TBC'
+    url = "http://ip.taobao.com/service/getIpInfo.php?ip={0}".format(ip)
+    response = requests.get(url)
+    code = int(response.json()['code'])
+    print(code)
+    if code == 0:
+        country_id = response.json()['data']["country_id"]
+        print(country_id)
+    return country_id
+
+
+    # url = 'http://apis.baidu.com/apistore/iplookupservice/iplookup?ip={0}'.format(ip)
+    # headers = {"apikey": "98b0fd667b061d25c9aea82c0f42d0b5"}
+    # response = requests.get(url, headers=headers)
+    # response.json()['pointList']
+    # url="http://www.google.com"
+    # proxies ={'http':"http://46.61.143.178:8080"}
+    # response = requests.get(url)
+    # print(response.text)
+    # print(response.status_code)
