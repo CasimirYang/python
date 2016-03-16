@@ -17,6 +17,8 @@
       <script src="//cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="//cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+      <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
   </head>
   <body>
 
@@ -34,16 +36,56 @@
             <h1 class="cover-heading">zhihu crawler</h1>
             <p class="lead">Premature optimization is the source of all evil.</p>
             <p class="lead">
-                <a href="/reflushIP"><span class="btn btn-lg btn-primary">stop</span></a>
-                <a href="#"><span class="btn btn-lg btn-primary">refulsh ip</span></a>
+                <a href="#" id="stopZhihu"><span class="btn btn-lg btn-primary">stop</span></a>
+                <a href="/#" id="reflushIP"><span class="btn btn-lg btn-primary">refulsh ip</span></a>
+                <a href="/#" id="GetTotalUser"><span class="btn btn-lg btn-primary">total user</span></a>
+                <a href="#" id="GetTotalRelationship"><span class="btn btn-lg btn-primary">total rela</span></a>
             </p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+  <script>
+      $(document).ready(function(){
+        $("#GetTotalRelationship").click(function(){
+            $.ajax({
+                url: "/GetTotalRelationship",
+                type: "post",
+                success: function (data){
+                alert(data);
+                }
+            });
+        }),
+        $("#GetTotalUser").click(function(){
+            $.ajax({
+                url: "/GetTotalUser",
+                type: "post",
+                success: function (data){
+                alert(data);
+                }
+            });
+        }),
+        $("#reflushIP").click(function(){
+            $.ajax({
+                url: "/reflushIP",
+                type: "post",
+                success: function (data){
+                alert(data);
+                }
+            });
+        }),
+         $("#stopZhihu").click(function(){
+            $.ajax({
+                url: "/stopZhihu",
+                type: "post",
+                success: function (data){
+                alert(data);
+                }
+            });
+        });
+      });
+  </script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="{{ static_url("js/bootstrap.min.js") }}"></script>
   </body>

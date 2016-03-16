@@ -2,7 +2,12 @@
 # -*- coding: utf-8 -*-
 import functools
 import logging
+import smtplib
 import time
+import traceback
+from email.header import Header
+from email.mime.text import MIMEText
+from email.utils import formataddr
 
 
 class User(object):
@@ -48,3 +53,18 @@ def log_time(param):
             return result
         return wrapper
     return decorator
+
+
+def sent_email(mess, tittle="Cralwer Alert"):
+    mess = "<html><body>{0}</body></html>".format(mess)
+    sent = "tianxiaofu2@sina.com"
+    server = smtplib.SMTP("smtp.sina.com", 25)
+    server.set_debuglevel(1)
+    server.login(sent, "txf1456123")
+    msg = MIMEText(mess, 'html', 'utf-8')
+    msg['From'] = formataddr((Header("Crawler", 'utf-8').encode(), sent))
+    msg['Subject'] = Header(tittle, 'utf-8').encode()
+    server.sendmail("tianxiaofu2@sina.com", ["704360537@qq.com"], str(msg))
+    server.quit()
+
+

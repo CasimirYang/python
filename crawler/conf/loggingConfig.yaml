@@ -12,42 +12,71 @@ handlers:
     class: logging.FileHandler
     level: DEBUG
     formatter: simple
-    filename: ../../log/ipCrawler.log
+    filename: log/ipCrawler.log
   neoIpCrawler:
-    class: logging.FileHandler
+    class: logging.handlers.RotatingFileHandler
+    maxBytes : 10485760
+    backupCount : 100
     level: DEBUG
     formatter: simple
-    filename: ../../log/neoIpCrawler.log
+    filename: log/neoIpCrawler.log
   neo:
-    class: logging.FileHandler
+    class: logging.handlers.RotatingFileHandler
+    maxBytes : 10485760
+    backupCount : 100
     level: DEBUG
     formatter: simple
-    filename: ../../log/neo.log
+    filename: log/neo.log
   zhihuFile:
-    class: logging.FileHandler
+    class: logging.handlers.RotatingFileHandler
+    maxBytes : 10485760
+    backupCount : 100
     level: DEBUG
     formatter: simple
-    filename: ../../log/zhihuCrawler.log
+    filename: log/zhihuCrawler.log
     encoding : UTF-8
+  apschedulerFile:
+    class: logging.handlers.RotatingFileHandler
+    maxBytes : 10485760
+    backupCount : 10
+    level: INFO
+    formatter: simple
+    filename: log/apschedulerFile.log
+    encoding : UTF-8
+  tornadoFile:
+    class: logging.handlers.RotatingFileHandler
+    maxBytes : 10485760
+    backupCount : 100
+    level: INFO
+    formatter: simple
+    filename: log/tornadoFile.log
   rootFile:
-    class: logging.FileHandler
+    class: logging.handlers.RotatingFileHandler
+    maxBytes : 10485760
+    backupCount : 100
     level: DEBUG
     formatter: simple
-    filename: ../../log/rootFileIpCrawler.log
+    filename: log/rootFile.log
 loggers:
 #  py2neo.cypher:
 #    level: INFO
 #    handlers: [neo]
   app.crawlerIP:
-    level: DEBUG
-    handlers: [console,ipFile]
-    propagate: no
+    level: INFO
+    handlers: [ipFile]
+    propagate: NO
   app.zhihu:
     level: INFO
-    handlers: [console,zhihuFile]
-  __main__:
+    handlers: [zhihuFile]
+    propagate: NO
+#  apscheduler.scheduler:
+#    level: INFO
+#    handlers: [apschedulerFile]
+#    propagate: YES
+  tornado.access:
     level: INFO
-    handlers: [console,zhihuFile]
-#root:
-#  level: DEBUG
-#  handlers: [console,rootFile]
+    handlers: [console,tornadoFile]
+    propagate: YES
+root:
+  level: INFO
+  handlers: [rootFile]

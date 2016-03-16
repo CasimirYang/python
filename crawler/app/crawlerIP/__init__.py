@@ -5,7 +5,7 @@
 class IpInfo(object):
     __slots__ = ('ip', 'host', 'user', 'password', 'type', 'location') # 用tuple定义允许绑定的属性名称
 
-    def __init__(self, ip, host, user='', password='', type='http', location='TBC'):
+    def __init__(self, ip, host, user='', password='', type='http', location='empty'):
         self.ip = ip
         self.host = host
         self.user = user

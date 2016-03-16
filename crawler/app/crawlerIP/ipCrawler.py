@@ -9,9 +9,6 @@ from app.crawlerIP.connectTest import connectTestAsync
 from app.crawlerIP.dbUtil import saveToNeo, locate_ip_country
 from app.crawlerIP.supplier import proxy360, xicidaili, bigdaili, youdaili
 
-yamlConfig = yaml.load(open(r'../../conf/loggingConfig.yaml', 'r'))
-logging.config.dictConfig(yamlConfig)
-
 logger = logging.getLogger(__name__)
 
 
@@ -63,3 +60,10 @@ def ipCrawler():
     logger.info('crawler IP finish.')
     locate_ip_country()
     logger.info('locate ip country finish.')
+
+
+def ip_crawler():
+    try:
+        ipCrawler()
+    except Exception:
+        logger.exception("ip crawler exception.")

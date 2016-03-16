@@ -64,13 +64,13 @@ def save_follow(user, followee_list, follow_type='ee'):
 def get_total_user():
     statement = "MATCH (peo:user) RETURN COUNT(peo)"
     record = graph.cypher.execute(statement)[0]
-    print("record:{0}".format(record))
-    return record
+    print("record:{0}".format(record[0]))
+    return record[0]
 
 
 @log_time("get total relationshiop.")
 def get_total_relationshiop():
     statement = "MATCH (:user)-[relat:follower]->(:user) RETURN COUNT(relat)"
     record = graph.cypher.execute(statement)[0]
-    print("record:{0}".format(record))
-    return record
+    print("record:{0}".format(record[0]))
+    return record[0]
