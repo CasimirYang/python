@@ -15,7 +15,8 @@ from app.schudulerJob import start_schuduler
 yamlConfig = yaml.load(open(r'conf/loggingConfig.yaml', 'r'))
 logging.config.dictConfig(yamlConfig)
 
-define("port", default=8000, help="run on the given port", type=int)
+#define("port", default=8080, help="run on the given port", type=int)
+
 
 setting = dict(
   template_path=os.path.join(os.path.dirname(__file__), "templates"),
