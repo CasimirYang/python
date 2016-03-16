@@ -9,7 +9,7 @@ import tornado.httpserver
 import url
 from app.crawlerIP.schudulerJob import schudulerStart
 
-define("port", default=8000, help="run on the given port", type=int)
+#define("port", default=8080, help="run on the given port", type=int)
 
 
 setting = dict(
@@ -33,9 +33,10 @@ if __name__ == "__main__":
     #schudulerStart()
     # conf_server=ServerConfig() #读取server的配置文件。
     # options.port=int(conf_server.getPort())
-    tornado.options.parse_command_line()
+    print("123")
+    #tornado.options.parse_command_line()
     application_setting_handle()
     app = tornado.web.Application(handlers=handlers, **setting)
     http_server = tornado.httpserver.HTTPServer(app)
-    http_server.listen(options.port)
+    http_server.listen('6464', address='0.0.0.0')
     tornado.ioloop.IOLoop.instance().start()
