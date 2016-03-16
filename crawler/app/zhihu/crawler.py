@@ -19,10 +19,9 @@ def begin_to_crawler():
         handle_follow(session, default_user)
         user_list = get_user()
     i = 0
-    print(len(user_list))
     while 1:
         i += 1
-        logger.info("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  {0}  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^".format(i))
+        logger.info("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  {0} cycle. ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^".format(i))
         if len(user_list) == 0:
             logger.info("crawler done.")
             total_user = get_total_user()

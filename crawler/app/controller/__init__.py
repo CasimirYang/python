@@ -7,7 +7,7 @@ import tornado
 from app.crawlerIP.ipCrawler import ip_crawler
 from app.zhihu.dbUtil import get_total_user, get_total_relationshiop
 
-logger = logging.getLogger()
+logger = logging.getLogger("tornado.access")
 
 
 class IndexHandler(tornado.web.RequestHandler):

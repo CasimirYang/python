@@ -58,9 +58,9 @@ handlers:
     formatter: simple
     filename: log/rootFile.log
 loggers:
-#  py2neo.cypher:
-#    level: INFO
-#    handlers: [neo]
+  py2neo.cypher:
+    level: ERROR
+    handlers: [neo]
   app.crawlerIP:
     level: INFO
     handlers: [ipFile]
@@ -69,14 +69,14 @@ loggers:
     level: INFO
     handlers: [zhihuFile]
     propagate: NO
-#  apscheduler.scheduler:
-#    level: INFO
-#    handlers: [apschedulerFile]
-#    propagate: YES
+  apscheduler.scheduler:
+    level: INFO
+    handlers: [apschedulerFile]
+    propagate: YES
   tornado.access:
     level: INFO
     handlers: [console,tornadoFile]
     propagate: YES
 root:
-  level: INFO
+  level: ERROR
   handlers: [rootFile]

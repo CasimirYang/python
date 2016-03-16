@@ -12,13 +12,13 @@ from app.zhihu.crawler import zhihu_crawler
 scheduler = TornadoScheduler()
 
 def ip_schuduler():
-  #  scheduler._logger = logging.getLogger('apscheduler.scheduler')
+    scheduler._logger = logging.getLogger('apscheduler.scheduler')
     scheduler.add_job(ip_crawler, 'interval', days=1) #need zhihu_scheduler stop to run
     scheduler.start()
 
 
 def zhihu_scheduler():
- #   scheduler._logger = logging.getLogger('apscheduler.scheduler')
+    scheduler._logger = logging.getLogger('apscheduler.scheduler')
     scheduler.add_job(zhihu_crawler)
     scheduler.start()
 
