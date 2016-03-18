@@ -29,8 +29,8 @@ handlers:
     filename: log/neo.log
   zhihuFile:
     class: logging.handlers.RotatingFileHandler
-    maxBytes : 10485760
-    backupCount : 100
+    maxBytes : 20485760
+    backupCount : 10
     level: DEBUG
     formatter: simple
     filename: log/zhihuCrawler.log

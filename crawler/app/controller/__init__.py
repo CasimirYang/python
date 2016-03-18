@@ -18,7 +18,7 @@ class IndexHandler(tornado.web.RequestHandler):
 class ReflushIP(tornado.web.RequestHandler):
      def post(self):
         logger.info("begin to reflush ip")
-        ip_crawler()
+       # ip_crawler()
         self.write("Done !")
 
 

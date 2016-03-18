@@ -3,15 +3,21 @@
 import json
 import logging
 import logging.config
-import aiohttp
+import os
+import pickle
+import traceback
 
+import aiohttp
+import asyncio
 import requests
 import time
+
+import tornado
 from requests import RequestException
 from bs4 import BeautifulSoup, SoupStrainer
 
 from app.crawlerIP.dbUtil import get_proxy_ip_host
-from app.zhihu import User, UserDetail, log_time
+from app.zhihu import User, UserDetail, log_time, sent_email
 from app.zhihu.dbUtil import save_user, save_follow, update_user_status
 
 logger = logging.getLogger(__name__)
@@ -36,49 +42,49 @@ def get_proxy():
 
 
 async def loginByAiohttp():
-    global cookies
-    global proxy
+    global client
+    global cookie
+    data = {"remember_me": "true", "email": "tianxiaofu2@sina.com", "password": "txf1456123"}
     url = "http://www.zhihu.com/login/email"
-    conn = aiohttp.ProxyConnector(proxy="http://58.83.174.114:80")
-    client = aiohttp.ClientSession(connector=conn)
-    try:
-        async with client.post(url, headers=headers, data=data) as resp:
-            cookies = resp.cookies
-            print(await resp.json())
-    finally:
-        client.close()
+    conn = aiohttp.ProxyConnector(proxy="http://119.39.191.52:80")
+    client = aiohttp.ClientSession()
+    resp = await client.post(url, headers=headers, data=data)
+    cookie = client.cookies
+    file = open(os.path.join(os.path.dirname(__file__), "cookie.txt"), 'wb')
+    pickle.dump(cookie, file)
+    file.close()
+    print("cookie:{0}".format(cookie))
+    print(await resp.json())
+
+    url2 = "http://www.zhihu.com/people/li-fang-quan-1/followers"
+    resp = await client.get(url2)
+    print(await resp.text())
+
+async def test(client):
+    print("test1")
+    homePageUrl = "https://www.zhihu.com/people/li-fang-quan-1/followers"
+    resp = await client.get(homePageUrl)
+    print("test2")
+    print(await resp.text())
+
+async def test2(client):
+    print("test1")
+    homePageUrl = "https://www.zhihu.com/people/li-fang-quan-1/followers"
+    resp = await client.get(homePageUrl)
+    print("test2")
+    print(await resp.text())
 
 
-async def loginedTest():
-    global cookies
-    global proxy
-    homePageUrl = "http://www.zhihu.com/people/tianxiaofu"
-    conn = aiohttp.ProxyConnector(proxy="http://58.83.174.114:80")
-    client = aiohttp.ClientSession(connector=conn)
+if __name__=='__main__':
+    file = open(os.path.join(os.path.dirname(__file__), "cookie.txt"), 'rb')
+    cookies = pickle.load(file)
+    file.close()
+    conn = aiohttp.ProxyConnector("http://222.176.112.10:80")
+    client = aiohttp.ClientSession(connector=conn, headers=headers)
     client._cookies = cookies
-    print(cookies)
-    try:
-        async with client.get(homePageUrl, headers=headers) as resp:
-            print(resp.status)
-            print(await resp.test())
-            # soup = BeautifulSoup(await resp.json(), "html.parser")
-            #  print(soup.prettify())
-    finally:
-        client.close()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(asyncio.wait([test(client), test2(client)]))
 
-
-def loginByRequests():
-    proxies = {'http': 'http://58.83.174.114:80'}
-    s = requests.Session()
-    url = "http://www.zhihu.com/login/email"
-    resp = requests.post(url, data=data, headers=headers, proxies=proxies)
-    s.cookies = resp.cookies
-    if resp.json()["msg"] == '登陆成功':
-        logger.info("------------success to login -----------------")
-    followees_PageUrl = "https://www.zhihu.com/people/tianxiaofu/followees"
-    followees_Page = s.get(followees_PageUrl, proxies=proxies)
-    soup = BeautifulSoup(followees_Page.text, "html.parser")
-    print(soup)
 
 
 def init_session():
@@ -97,8 +103,34 @@ def init_session():
 def handle_follow(session, origin_user):
     logger.info("begin to handle user:{0}".format(origin_user.user_id))
     update_user_status(origin_user, 1)
-    handle_follow_item(session, origin_user, 'ee')
-    handle_follow_item(session, origin_user, 'er')
+    item_flag = 0
+    while 1:
+        item_flag += 1
+        try:
+            handle_follow_item(session, origin_user, 'ee')
+        except Exception as e:
+            sent_email("Crawler Exception. handle_followee_item :<br />", traceback.format_exc())
+            logger.exception("retry {0}. time:".format("handle_followee_item", item_flag))
+            if item_flag > 5:
+                raise e
+            else:
+                continue
+        else:
+            item_flag = 0
+            break
+    while 1:
+        item_flag += 1
+        try:
+            handle_follow_item(session, origin_user, 'er')
+        except Exception as e:
+            sent_email("Crawler Exception. handle_follower_item :<br />", traceback.format_exc())
+            logger.exception("retry {0}. time:".format("handle_follower_item", item_flag))
+            if item_flag > 5:
+                raise e
+            else:
+                continue
+        else:
+            break
     update_user_status(origin_user, 2)
 
 
@@ -174,12 +206,12 @@ def get_response(session, follow_url, follow_data, headers, request_type='post')
             else:
                 resp = session.post(follow_url, data=follow_data, headers=headers, timeout=60)
             if resp.status_code != 200:
-                logger.error("error static:{0}".format(resp.status_code))
-                time.sleep(15)
+                logger.error("error status:{0}".format(resp.status_code))
+                #time.sleep(5)
                 session.proxies = get_proxy()
             else:
                 return resp
         except RequestException:
             logger.exception("get offset response exception.")
-            time.sleep(15)
+            #time.sleep(5)
             session.proxies = get_proxy()

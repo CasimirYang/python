@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 @log_time("get users.")
 def get_user():
-    statement = "MATCH(user:user {static:0}) RETURN user.user_id,user.user_name LIMIT 2"
+    statement = "MATCH(user:user {status:0}) RETURN user.user_id,user.user_name LIMIT 4"
     record_list = graph.cypher.execute(statement)
     user_list = []
     for record in record_list:
@@ -23,21 +23,20 @@ def get_user():
     return user_list
 
 
-@log_time("update users static.")
+@log_time("update users status.")
 def update_user_status(user, status):
-    statement = "MERGE (target:user {user_id:{user_id}}) SET target.user_name={user_name},target.static={static}"
-    graph.cypher.execute(statement, {"user_id": user.user_id, "user_name": user.user_name, "static": status})
+    statement = "MERGE (target:user {user_id:{user_id}}) SET target.user_name={user_name},target.status={status}"
+    graph.cypher.execute(statement, {"user_id": user.user_id, "user_name": user.user_name, "status": status})
 
 
 @log_time("save users.")
 def save_user(user_list):
     transaction = graph.cypher.begin()
-    statement = "MERGE (peo:user{user_id:{user_id}}) ON MATCH SET peo.static={static}  " \
-                "ON CREATE SET peo.user_name={user_name},peo.static={static}"
+    statement = "MERGE (peo:user{user_id:{user_id}}) ON CREATE SET peo.user_name={user_name},peo.status={status}"
     for user in user_list:
         user_id = user.user_id
         user_name = user.user_name
-        transaction.append(statement, {"user_id": user_id, "user_name": user_name, "static": user.status})
+        transaction.append(statement, {"user_id": user_id, "user_name": user_name, "status": user.status})
         transaction.process()
     transaction.commit()
 

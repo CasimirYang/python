@@ -67,3 +67,6 @@ def ip_crawler():
         ipCrawler()
     except Exception:
         logger.exception("ip crawler exception.")
+
+if __name__=='__main__':
+    ip_crawler()

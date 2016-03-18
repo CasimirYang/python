@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 import asyncio
 import logging
+import os
+import pickle
 
 import aiohttp
 import requests
@@ -49,13 +51,21 @@ def connectTestAsync(ipInfoList):
 
 
 async def fetch(ipInfo):
-    with aiohttp.Timeout(0.5):
+    with aiohttp.Timeout(1):
         global list
-        url = "http://www.baidu.com"
+        #url = "http://www.zhihu.com"
+
+        url = "https://www.zhihu.com/people/li-fang-quan-1/followers"
+
         proxy = "http://{ip}:{host}".format(type=ipInfo.type, ip=ipInfo.ip, host=ipInfo.host)
         logger.info("crawler from :{url} using:{proxy}".format(url=url, proxy=proxy))
         conn = aiohttp.ProxyConnector(proxy=proxy)
         client = aiohttp.ClientSession(connector=conn)
+
+        file = open(os.path.join(os.path.dirname(__file__), "cookie.txt"), 'rb')
+        cookies = pickle.load(file)
+        file.close()
+        client._cookies = cookies
         try:
             async with client.get(url) as resp:
                 if resp.status == 200:
@@ -79,13 +89,3 @@ def check_cn_ip(ip):
         print(country_id)
     return country_id
 
-
-    # url = 'http://apis.baidu.com/apistore/iplookupservice/iplookup?ip={0}'.format(ip)
-    # headers = {"apikey": "98b0fd667b061d25c9aea82c0f42d0b5"}
-    # response = requests.get(url, headers=headers)
-    # response.json()['pointList']
-    # url="http://www.google.com"
-    # proxies ={'http':"http://46.61.143.178:8080"}
-    # response = requests.get(url)
-    # print(response.text)
-    # print(response.status_code)
