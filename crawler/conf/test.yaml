@@ -8,6 +8,11 @@ handlers:
     level: INFO
     formatter: simple
     stream: ext://sys.stdout
+  zhihuFile:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: simple
+    stream: ext://sys.stdout
 root:
   level: INFO
   handlers: [console]
